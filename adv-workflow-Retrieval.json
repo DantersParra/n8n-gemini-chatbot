@@ -1,0 +1,224 @@
+{
+  "name": "Retrieval",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "query"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -416,
+        16
+      ],
+      "id": "505fda01-f44e-4d60-a092-1d01eb231803",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "mode": "load",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "n8n-test-adv",
+          "mode": "list",
+          "cachedResultName": "n8n-test-adv"
+        },
+        "prompt": "={{ $json.query }}",
+        "topK": 5,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        -208,
+        16
+      ],
+      "id": "764a502b-c5b7-4848-885d-d660ae0286f0",
+      "name": "Pinecone Vector Store",
+      "credentials": {
+        "pineconeApi": {
+          "id": "z2D7RsKS3s2aNpzP",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        224
+      ],
+      "id": "62d89ad6-8af0-4e91-8f21-cab48fef2cf1",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Q8hg9yMxiBzUje8b",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d6c52d82-fefc-42f7-9af0-dcaabbd2d616",
+              "name": "content",
+              "value": "={{ $json.document.pageContent }}",
+              "type": "string"
+            },
+            {
+              "id": "e17acf80-95cc-41a0-994d-70261435c454",
+              "name": "filename",
+              "value": "={{ $json.document.metadata['Document ID'] }}",
+              "type": "string"
+            },
+            {
+              "id": "f8a0eb67-525e-4a0e-a521-9b57ed874de8",
+              "name": "url",
+              "value": "={{ $json.document.metadata['Document URL'] }}",
+              "type": "string"
+            },
+            {
+              "id": "f71e2ba3-84fb-498f-9278-6ab6a7a0c4da",
+              "name": "pagenumber",
+              "value": "={{ $json.document.metadata['loc.pageNumber'] }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        144,
+        16
+      ],
+      "id": "db6531b3-0302-428e-93cf-e9c0046cb84e",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        352,
+        16
+      ],
+      "id": "898e5e95-26ad-452c-86b4-e4f151278b59",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c5ed957e-5e7b-476b-80fc-5f7b0e10f4b0",
+              "name": "reponse",
+              "value": "={{ $json.toJsonString() }} }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        560,
+        16
+      ],
+      "id": "1b42fc5a-5fa9-46e6-81c5-046f893a5617",
+      "name": "Edit Fields1"
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "query": "vacation leaves"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "5100e883-6dee-405c-9a5d-cd162b22f4a8",
+  "meta": {
+    "instanceId": "bbe7cbb75924a16e51a21390299b666260a2b964ec213b954960d2c1855cd78d"
+  },
+  "id": "gb2fub121P3G57Go1QkaE",
+  "tags": []
+}

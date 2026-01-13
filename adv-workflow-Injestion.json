@@ -1,0 +1,370 @@
+{
+  "name": "Injestion",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        16
+      ],
+      "id": "44524cca-f257-45a0-9770-764049864631",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d7f166ff-f604-44aa-83de-9554c6f225f1",
+              "name": "repo_owner",
+              "value": "LinkedInLearning",
+              "type": "string"
+            },
+            {
+              "id": "0769628f-a731-484b-b625-f590c83e742a",
+              "name": "repo_name",
+              "value": "create-custom-chatbots-with-n8n-and-vector-search-4078220",
+              "type": "string"
+            },
+            {
+              "id": "03a248b3-b1c4-4034-bdba-0de24593563c",
+              "name": "doc_path",
+              "value": "advanced-chatbot/documents",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        16
+      ],
+      "id": "90863c36-3275-4953-95f2-94b559385f6d",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "file",
+        "operation": "list",
+        "owner": {
+          "__rl": true,
+          "value": "={{ $json.repo_owner }}",
+          "mode": "name"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "={{ $json.repo_name }}",
+          "mode": "name"
+        },
+        "filePath": "={{ $json.doc_path }}"
+      },
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1.1,
+      "position": [
+        416,
+        16
+      ],
+      "id": "1b2b40e4-313c-41a2-bb45-752062932986",
+      "name": "List files",
+      "webhookId": "138cadaf-59b7-492d-85c5-fa0ee02951d7",
+      "credentials": {
+        "githubOAuth2Api": {
+          "id": "d0x6YG9CXNqh3aUd",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "file",
+        "operation": "get",
+        "owner": {
+          "__rl": true,
+          "value": "={{ $('Edit Fields').item.json.repo_owner }}",
+          "mode": "name"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "={{ $('Edit Fields').item.json.repo_name }}",
+          "mode": "name"
+        },
+        "filePath": "={{ $json.path }}",
+        "additionalParameters": {}
+      },
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1.1,
+      "position": [
+        624,
+        16
+      ],
+      "id": "a66e5407-079c-447c-babb-7bdd17e3fc05",
+      "name": "Get a file",
+      "webhookId": "5222f47b-48d5-4816-8280-6a9054ba82cf",
+      "credentials": {
+        "githubOAuth2Api": {
+          "id": "d0x6YG9CXNqh3aUd",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "n8n-test-adv",
+          "mode": "list",
+          "cachedResultName": "n8n-test-adv"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        1616,
+        0
+      ],
+      "id": "44d6d9a8-c30c-4c15-8640-5282fa99fac2",
+      "name": "Pinecone Vector Store",
+      "credentials": {
+        "pineconeApi": {
+          "id": "z2D7RsKS3s2aNpzP",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1248,
+        208
+      ],
+      "id": "091995fc-f55e-4053-a4ca-e5c8afa7f5b8",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Q8hg9yMxiBzUje8b",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "binaryMode": "specificField",
+        "loader": "pdfLoader",
+        "textSplittingMode": "custom",
+        "options": {
+          "splitPages": true,
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "Document ID",
+                "value": "={{ $json.name }}"
+              },
+              {
+                "name": "Document URL",
+                "value": "={{ $json.html_url }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        1376,
+        208
+      ],
+      "id": "142444bd-e21f-42ce-8639-c676fec7a255",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "chunkOverlap": 100
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        1376,
+        384
+      ],
+      "id": "a8b68c7e-03a2-40eb-baa0-abcbcb61132b",
+      "name": "Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://n8n-test-adv-0sp217w.svc.aped-4627-b74a.pinecone.io/vectors/delete",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "pineconeApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "deleteAll",
+              "value": "true"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        880,
+        -160
+      ],
+      "id": "ecce3b50-6e6e-4d27-9e81-b9311a1be881",
+      "name": "HTTP Request",
+      "credentials": {
+        "pineconeApi": {
+          "id": "z2D7RsKS3s2aNpzP",
+          "name": "PineconeApi account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "mode": "chooseBranch"
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1152,
+        0
+      ],
+      "id": "725d2746-647f-4b36-87df-8a889d0189b2",
+      "name": "Merge"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "List files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List files": {
+      "main": [
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "7a8be829-313d-473f-986f-8e43042b72fd",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "bbe7cbb75924a16e51a21390299b666260a2b964ec213b954960d2c1855cd78d"
+  },
+  "id": "1EFmxK_tXBtO0ljM23yZB",
+  "tags": []
+}

@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@n8n/chat": "^1.4.0",
+    "@tailwindcss/cli": "^4.1.18",
+    "tailwindcss": "^4.1.18"
+  }
+}

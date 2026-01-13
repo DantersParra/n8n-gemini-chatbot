@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Simple n8n with Gemini chatbox</title>
+
+    <link href="./output.css" rel="stylesheet">
+  </head>
+  <body class="">
+
+    <section class="flex h-screen items-center justify-center">
+
+        <!-- 
+        
+        SIMPLE CHAT BOX
+        Uses n8n workflow with:
+        1. Chat
+        2. AI Agent - has 'simple-system-prompt.txt' set as system message
+        3. Google gemini chat model
+        4. Simple memory - set to 5
+
+        n8n CHATBOX DOCUMENTATION
+        https://www.npmjs.com/package/@n8n/chat
+        
+        -->
+
+        <div class="flex flex-col justify-center">
+            <div id="n8n-chat" class="border-2 border-slate-800">
+            </div>
+        </div>
+
+    </section>
+
+    <link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
+    <script type="module">
+        import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
+
+        createChat({
+            webhookUrl: 'https://danteparra.app.n8n.cloud/webhook/baabbb42-c055-44e8-ba94-4fcffc3be709/chat',
+            target: '#n8n-chat',
+            mode: 'fullscreen',
+            initialMessages: [
+                'Hi there! Let me assist you with any of your Legend of Zelda lore questions'
+            ],
+            i18n: {
+                en: {
+                    title: '',
+                    subtitle: "",
+                    footer: '',
+                    getStarted: 'New Conversation',
+                    inputPlaceholder: 'Type your question..',
+                },
+            },
+        });
+    </script>
+  </body>
+</html>

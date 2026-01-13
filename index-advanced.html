@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Advanced n8n with Gemini chatbox</title>
+
+    <link href="./output.css" rel="stylesheet">
+  </head>
+  <body class="">
+
+    <section class="flex h-screen items-center justify-center">
+
+        <!-- 
+        ADVANCED CHAT BOX
+
+        INJESTION WORKFLOW
+        1. Manual execute workflow
+        2. Edit fields
+            repo_owner: 
+            "LinkedInLearning"
+            repo_name: 
+            "create-custom-chatbots-with-n8n-and-vector-search-4078220"
+            doc_path: 
+            "advanced-chatbot/documents"
+
+        3. List files - Github
+            Uses fields from 'Edit fields' node
+
+        4. Get files - Github
+            Uses fields from 'Edit fields' node
+            EXCEPT path which uses from 'List files' node
+
+        5. Pinecone vector store
+            Embed google gemini
+                Default data loader
+                Text splitter
+    
+        EXTRA
+        6. Add HTTP Request to delete files and update with new updated files
+        7. Merge choose branch
+        
+
+        RETRIEVAL WORKFLOW
+        1. When executed by 'INJESTION' workflow
+        2. Pinecone vector store
+        3. Edit fields to select relevant information
+        4. Aggregate to 1 item
+        5. Edit fields to turn 1 item to string for LLM
+        
+
+
+        USES DATA FROM COURSE GITHUB REPO
+        https://github.com/LinkedInLearning/create-custom-chatbots-with-n8n-and-vector-search-4078220/tree/main/simple-chatbot
+
+        Included to read the document files under "LIST FILES" node in workflow:
+        
+        
+
+        n8n CHATBOX DOCUMENTATION
+        https://www.npmjs.com/package/@n8n/chat
+        -->
+
+
+        <div class="flex flex-col justify-center">
+            <div id="n8n-chat" class="border-2 border-slate-800">
+            </div>
+        </div>
+
+    </section>
+
+    <link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
+    <script type="module">
+        import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
+
+        createChat({
+            webhookUrl: 'https://danteparra.app.n8n.cloud/webhook/7c9d16d2-7247-446f-8a8b-9a6115932e79/chat',
+            target: '#n8n-chat',
+            mode: 'fullscreen',
+            initialMessages: [
+                'Hi there! This is an HR tool, how can I help you?'
+            ],
+            i18n: {
+                en: {
+                    title: '',
+                    subtitle: "",
+                    footer: '',
+                    getStarted: 'New Conversation',
+                    inputPlaceholder: 'Type your question..',
+                },
+            },
+        });
+    </script>
+  </body>
+</html>
